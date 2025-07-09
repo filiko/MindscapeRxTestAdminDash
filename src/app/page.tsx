@@ -27,6 +27,11 @@ export default function Home() {
     return statusPriority[a.onboardingStatus] - statusPriority[b.onboardingStatus];
   });
 
+  // Calculate patient summary statuses from actual data
+  const preSessionCount = mockPatients.filter(patient => patient.onboardingStatus === 'pending').length;
+  const postSessionCount = mockPatients.filter(patient => patient.onboardingStatus === 'in-progress').length;
+  const overdueCount = mockPatients.filter(patient => patient.onboardingStatus === 'completed' && !patient.lastContact).length;
+
   const handleSendMessage = (content: string, templateId: string | null) => {
     if (!selectedPatient) return;
 
@@ -44,25 +49,25 @@ export default function Home() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <Header></Header>
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50">
+      <Header onLogoClick={() => { setSelectedPatient(null); setIsMessaging(false); }}></Header>
 
       <div className="flex h-[calc(100vh-90px)]">
         {/* Patient List Sidebar */}
-        <div className="w-96 bg-white border-r border-gray-200 flex flex-col">
-          <div className="p-4 border-b border-gray-200">
+        <div className="w-96 bg-white border-r border-slate-300 flex flex-col shadow-xl">
+          <div className="p-6 border-b border-slate-200">
             <input
               type="text"
               placeholder="Search patients..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              className="w-full px-4 py-3 border border-slate-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-400 bg-white text-slate-700 placeholder-slate-500"
             />
           </div>
 
           <div className="flex-1 overflow-y-auto">
-            <div className="p-4 bg-gray-50 border-b border-gray-200">
-              <div className="text-sm font-medium text-gray-900">
+            <div className="p-6 bg-slate-50 border-b border-slate-200">
+              <div className="text-sm font-semibold text-slate-700">
                 {sortedPatients.length} Patients
               </div>
             </div>
@@ -80,40 +85,42 @@ export default function Home() {
         </div>
 
         {/* Main Content Area */}
-        <div className="flex-1 p-6 overflow-y-auto bg-black/60">
+        <div className="flex-1 p-8 overflow-y-auto bg-gradient-to-br from-slate-50 to-blue-50">
           {selectedPatient ? (
-            <div className="max-w-4xl mx-auto space-y-6">
+            <div className="max-w-5xl mx-auto space-y-8">
               {/* Patient Header */}
-              {!isMessaging ? (<div className="max-w-4xl mx-auto items-center"><PatientDetails patient={selectedPatient} onSendMessage={() => setIsMessaging(true)}></PatientDetails></div>) :
-                (
-                  <MessageComposer
-                    patient={selectedPatient}
-                    onSendMessage={handleSendMessage}
-                  />
-                  )}
+              {!isMessaging ? (
+                <div className="max-w-5xl mx-auto">
+                  <PatientDetails patient={selectedPatient} onSendMessage={() => setIsMessaging(true)} />
+                </div>
+              ) : (
+                <MessageComposer
+                  patient={selectedPatient}
+                  onSendMessage={handleSendMessage}
+                />
+              )}
               <MessageHistory patientId={selectedPatient.id} />
-
             </div>
           ) : (
             <div className="flex items-center justify-center h-full">
-              <div className="text-center">
-                <MessageSquare className="w-16 h-16 text-blue-400 mx-auto mb-4" />
-                <h3 className="text-lg font-medium text-white mb-2">Welcome to MindScape Admin Dashboard</h3>
-                <p className="text-white/30">Send compassionate, timely messages to support healing journeys</p>
+              <div className="text-center max-w-2xl">
+                <h3 className="text-3xl font-bold text-slate-800 mb-4">Welcome!</h3>
                 {/* Patient Summary Statuses */}
-                <div className="mt-8 p-4 bg-blue-50 border border-blue-200 rounded-lg flex flex-col gap-2 max-w-md mx-auto">
-                  <div className="font-semibold text-blue-900">Patient Summary Statuses</div>
-                  <div className="text-blue-800 flex justify-between">
-                    <span>Need Pre-Session Reminder</span>
-                    <span className="font-semibold">5</span>
-                  </div>
-                  <div className="text-blue-800 flex justify-between">
-                    <span>Awaiting Post-Session Check-in</span>
-                    <span className="font-semibold">3</span>
-                  </div>
-                  <div className="text-blue-800 flex justify-between">
-                    <span>Overdue for Follow-Up</span>
-                    <span className="font-semibold">2</span>
+                <div className="bg-white/80 backdrop-blur-sm border border-slate-200/60 rounded-2xl p-8 shadow-lg max-w-lg mx-auto">
+                  <div className="font-bold text-slate-800 text-lg mb-6">Patient Summary Statuses</div>
+                  <div className="space-y-4">
+                    <div className="flex justify-between items-center p-3 bg-gradient-to-r from-amber-50 to-orange-50 rounded-xl border border-amber-200/60">
+                      <span className="text-slate-700 font-medium">Need Pre-Session Reminder</span>
+                      <span className="font-bold text-amber-600 text-lg">{preSessionCount}</span>
+                    </div>
+                    <div className="flex justify-between items-center p-3 bg-gradient-to-r from-blue-50 to-indigo-50 rounded-xl border border-blue-200/60">
+                      <span className="text-slate-700 font-medium">Awaiting Post-Session Check-in</span>
+                      <span className="font-bold text-blue-600 text-lg">{postSessionCount}</span>
+                    </div>
+                    <div className="flex justify-between items-center p-3 bg-gradient-to-r from-red-50 to-pink-50 rounded-xl border border-red-200/60">
+                      <span className="text-slate-700 font-medium">Overdue for Follow-Up</span>
+                      <span className="font-bold text-red-600 text-lg">{overdueCount}</span>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -121,6 +128,6 @@ export default function Home() {
           )}
         </div>
       </div>
-    </div >
+    </div>
   );
 };
