@@ -1,19 +1,14 @@
-import { MessageSquare } from "lucide-react";
+import Image from "next/image";
 
 export default function Header() {
 	return (
-		< div className="bg-white border-b border-gray-200 h-[90px]" >
-			<div className="px-6 py-4">
-				<div className="flex items-center gap-4">
-					<div className="w-8 h-8 bg-[#E9F9FD] rounded-lg flex items-center justify-center">
-						<MessageSquare className="w-5 h-5 text-blue-600" />
-					</div>
-					<div>
-						<h1 className="text-2xl font-bold text-gray-900">Welcome to MindScape Admin Dashboard</h1>
-						<p className="text-gray-600">Send compassionate, timely messages to support healing journeys</p>
-					</div>
-				</div>
-			</div>
-		</div >
+		<div className="w-full bg-black/80 flex items-center px-8 py-1 h-[90px]">
+			<img src="https://mindscaperx.com/images/logo.svg" alt="MindscapeRx Logo" className="h-16 w-auto mr-3" />⠀⠀
+			<span className="text-white text-2xl tracking-tight text-5xl leading-tight" style={{ fontFamily: 'Montserrat, sans-serif' }}>
+				{/* Admin<span className="text-yellow-400"> Panel</span> */}
+				Admin Panel
+			</span>
+			{/* Optionally, add navigation or user info here */}
+		</div>
 	)
 }

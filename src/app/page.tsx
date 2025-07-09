@@ -8,10 +8,11 @@ import Header from "@/components/layout/Header";
 import { mockMessageHistory, mockPatients } from "@/lib/data";
 import { MessageSquare, User } from "lucide-react";
 import { useState } from "react";
-import Footer from "@/components/layout/Footer";
+import { PatientDetails } from "@/components/dashboard/PatientDetails";
 
 export default function Home() {
   const [selectedPatient, setSelectedPatient] = useState<Patient | null>(null);
+  const [isMessaging, setIsMessaging] = useState<boolean>(false);
   const [messageHistory, setMessageHistory] = useState<Message[]>(mockMessageHistory);
   const [searchTerm, setSearchTerm] = useState('');
 
@@ -19,6 +20,12 @@ export default function Home() {
     patient.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
     patient.email.toLowerCase().includes(searchTerm.toLowerCase())
   );
+
+  // Sort patients by status priority: pending -> in-progress -> completed
+  const sortedPatients = filteredPatients.sort((a, b) => {
+    const statusPriority = { 'pending': 1, 'in-progress': 2, 'completed': 3 };
+    return statusPriority[a.onboardingStatus] - statusPriority[b.onboardingStatus];
+  });
 
   const handleSendMessage = (content: string, templateId: string | null) => {
     if (!selectedPatient) return;
@@ -38,9 +45,9 @@ export default function Home() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <Header />
+      <Header></Header>
 
-      <div className="flex h-[calc(100vh-180px)]">
+      <div className="flex h-[calc(100vh-90px)]">
         {/* Patient List Sidebar */}
         <div className="w-96 bg-white border-r border-gray-200 flex flex-col">
           <div className="p-4 border-b border-gray-200">
@@ -56,69 +63,64 @@ export default function Home() {
           <div className="flex-1 overflow-y-auto">
             <div className="p-4 bg-gray-50 border-b border-gray-200">
               <div className="text-sm font-medium text-gray-900">
-                {filteredPatients.length} Patients
+                {sortedPatients.length} Patients
               </div>
             </div>
 
-            {filteredPatients.map((patient) => (
+            {sortedPatients.map((patient) => (
               <PatientListItem
                 key={patient.id}
                 patient={patient}
                 isSelected={selectedPatient?.id === patient.id}
-                onClick={() => setSelectedPatient(patient)}
+                onClick={() => { setSelectedPatient(patient); setIsMessaging(false); }}
+                onClickMessage={(e: any) => { e.stopPropagation(); setSelectedPatient(patient); setIsMessaging(true); }}
               />
             ))}
           </div>
         </div>
 
         {/* Main Content Area */}
-        <div className="flex-1 p-6 overflow-y-auto">
+        <div className="flex-1 p-6 overflow-y-auto bg-black/60">
           {selectedPatient ? (
             <div className="max-w-4xl mx-auto space-y-6">
               {/* Patient Header */}
-              <div className="bg-white border border-gray-200 rounded-lg p-6">
-                <div className="flex items-center gap-4">
-                  <div className="w-12 h-12 bg-[#E9F9FD] rounded-full flex items-center justify-center">
-                    <User className="w-6 h-6 text-blue-600" />
-                  </div>
-                  <div>
-                    <h2 className="text-xl font-semibold text-gray-900">{selectedPatient.name}</h2>
-                    <div className="flex items-center gap-4 mt-1">
-                      <StatusBadge status={selectedPatient.onboardingStatus} />
-                      <span className="text-sm text-gray-600">
-                        Last contact: {selectedPatient.lastContact
-                          ? new Date(selectedPatient.lastContact).toLocaleDateString()
-                          : 'Never'
-                        }
-                      </span>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              {/* Message Composer */}
-              <MessageComposer
-                patient={selectedPatient}
-                onSendMessage={handleSendMessage}
-              />
-
-              {/* Message History */}
+              {!isMessaging ? (<div className="max-w-4xl mx-auto items-center"><PatientDetails patient={selectedPatient} onSendMessage={() => setIsMessaging(true)}></PatientDetails></div>) :
+                (
+                  <MessageComposer
+                    patient={selectedPatient}
+                    onSendMessage={handleSendMessage}
+                  />
+                  )}
               <MessageHistory patientId={selectedPatient.id} />
+
             </div>
           ) : (
             <div className="flex items-center justify-center h-full">
               <div className="text-center">
-                <MessageSquare className="w-16 h-16 text-gray-400 mx-auto mb-4" />
-                <h3 className="text-lg font-medium text-gray-900 mb-2">Select a Patient</h3>
-                <p className="text-gray-600">Choose a patient from the list to send a message</p>
+                <MessageSquare className="w-16 h-16 text-blue-400 mx-auto mb-4" />
+                <h3 className="text-lg font-medium text-white mb-2">Welcome to MindScape Admin Dashboard</h3>
+                <p className="text-white/30">Send compassionate, timely messages to support healing journeys</p>
+                {/* Patient Summary Statuses */}
+                <div className="mt-8 p-4 bg-blue-50 border border-blue-200 rounded-lg flex flex-col gap-2 max-w-md mx-auto">
+                  <div className="font-semibold text-blue-900">Patient Summary Statuses</div>
+                  <div className="text-blue-800 flex justify-between">
+                    <span>Need Pre-Session Reminder</span>
+                    <span className="font-semibold">5</span>
+                  </div>
+                  <div className="text-blue-800 flex justify-between">
+                    <span>Awaiting Post-Session Check-in</span>
+                    <span className="font-semibold">3</span>
+                  </div>
+                  <div className="text-blue-800 flex justify-between">
+                    <span>Overdue for Follow-Up</span>
+                    <span className="font-semibold">2</span>
+                  </div>
+                </div>
               </div>
             </div>
           )}
         </div>
       </div>
-
-      <Footer />
-
-    </div>
+    </div >
   );
 };

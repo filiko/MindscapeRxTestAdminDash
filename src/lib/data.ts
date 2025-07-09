@@ -43,6 +43,50 @@ export const mockPatients: Patient[] = [
     onboardingStatus: "in-progress", 
     joinedDate: "2024-06-28",
     lastContact: "2024-07-06"
+  },
+  {
+    id: "6",
+    name: "James Patel",
+    email: "james.patel@email.com",
+    phone: "(555) 678-9012",
+    onboardingStatus: "completed",
+    joinedDate: "2024-06-10",
+    lastContact: "2024-07-08"
+  },
+  {
+    id: "7",
+    name: "Olivia Kim",
+    email: "olivia.kim@email.com",
+    phone: "(555) 789-0123",
+    onboardingStatus: "pending",
+    joinedDate: "2024-07-10"
+  },
+  {
+    id: "8",
+    name: "William Johnson",
+    email: "will.johnson@email.com",
+    phone: "(555) 890-1234",
+    onboardingStatus: "completed",
+    joinedDate: "2024-06-18",
+    lastContact: "2024-07-07"
+  },
+  {
+    id: "9",
+    name: "Sophia Martinez",
+    email: "sophia.martinez@email.com",
+    phone: "(555) 901-2345",
+    onboardingStatus: "in-progress",
+    joinedDate: "2024-07-03",
+    lastContact: "2024-07-06"
+  },
+  {
+    id: "10",
+    name: "Benjamin Lee",
+    email: "benjamin.lee@email.com",
+    phone: "(555) 012-3456",
+    onboardingStatus: "completed",
+    joinedDate: "2024-06-22",
+    lastContact: "2024-07-08"
   }
 ];
 
